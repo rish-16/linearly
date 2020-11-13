@@ -1,4 +1,4 @@
-class Matrix(list):
+class Matrix():
     def __init__(self, mat):
         """
         mat: 2-dimensional array representing matrix of size m x n
@@ -79,3 +79,28 @@ class Matrix(list):
         for i in range(len(self.mat)):
             final.append(repr(self.mat[i]))
         return "\n".join(final)
+        
+class GaussJordonSolver:
+    def __init__(self, mat):
+        self.mat = mat
+    
+    def ero_type_1(self, i, k):
+        """
+        Type 1 ERO: scalar multiplication
+        """
+        self.mat[i] = [k * self.mat[i][j] for j in range(len(self.mat[i]))]
+        
+    def ero_type_2(self, i, j):
+        """
+        Type 2 ERO: row swapping
+        """
+        
+        temp = self.mat[i]
+        self.mat[i] = self.mat[j]
+        self.mat[j] = temp
+        
+    def ero_type_3(self, i, j, k):
+        """
+        Type 3 ERO: addition of multiple of row
+        """
+        self.mat[i] = [self.mat[i] + (k * self.mat[j][p]) for p in range(len(self.mat[j]))]

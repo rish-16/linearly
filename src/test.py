@@ -1,4 +1,4 @@
-from linearly import Matrix
+from linearly import Matrix, GaussJordanSolver
 
 a = Matrix([
             [1],
@@ -9,3 +9,5 @@ a = Matrix([
 b = Matrix([
             [1, 2, 3]
         ])
+        
+gjs = GaussJordanSolver(a)
