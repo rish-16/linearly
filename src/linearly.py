@@ -30,6 +30,9 @@ class Matrix(list):
             
         return Matrix(res)
         
+    def get_col(self, arr, i):
+        return [row[i] for row in arr]
+        
     def _dot(self, a, b):
         n_cols = len(a)
         n_rows = len(b)
@@ -43,15 +46,12 @@ class Matrix(list):
         
         dim1 = self.get_size()[0]
         dim2 = b.get_size()[1]
-        
-        def get_col(arr, i):
-            return [row[i] for row in arr]
             
         res = [[None for j in range(dim2)] for i in range(dim1)]
         
         for i in range(dim1):
             for j in range(dim2):
-                res[i][j] = self._dot(self.mat[i], get_col(b.mat, j))
+                res[i][j] = self._dot(self.mat[i], self.get_col(b.mat, j))
                 
         return Matrix(res)
         
@@ -63,6 +63,16 @@ class Matrix(list):
         for i in range(m-1):
             cur  = cur * self
         return cur
+        
+    def transpose(self):
+        dim1 = self.get_size()[0]
+        dim2 = self.get_size()[1]
+        res = [[None for j in range(dim1)] for i in range(dim2)]
+        for i in range(dim2):
+            for j in range(dim1):
+                res[i][j] = self.mat[j][i]
+                
+        return Matrix(res)
                 
     def __str__(self):
         final = []
