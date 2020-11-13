@@ -1,14 +1,15 @@
 from linearly import Matrix
 
 a = Matrix([
-            [1, 2, 3]
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1]
         ])
         
 b = Matrix([
-            [1, 2],
-            [1, 2],
-            [1, 2]
+            [1, 2, 3],
+            [1, 2, 3],
+            [1, 2, 3]
         ])
         
-c = a * b
-print (c)
+print (b ** 2)
