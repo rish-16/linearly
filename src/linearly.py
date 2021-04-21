@@ -155,7 +155,7 @@ class GaussJordonSolver:
         nz_count = 0 # number of non zero rows
         for r in range(dim1):
             row = self.mat.get_row(r)
-            if (row != Matrix([0 for _ in range(dim2)])):
+            if (row != [0 for _ in range(dim2)]):
                 nz_count += 1
 
         return nz_count
