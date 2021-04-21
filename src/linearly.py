@@ -148,8 +148,17 @@ class GaussJordonSolver:
         """
         self.mat[i] = [self.mat[i] + (k * self.mat[j][p]) for p in range(len(self.mat[j]))]
 
-    def filter_zeros(self):
-        return self.mat
+    def get_nonzero_row_count(self):
+        dim1 = self.mat.get_size()[0]
+        dim2 = self.mat.get_size()[1]
+
+        nz_count = 0 # number of non zero rows
+        for r in range(dim1):
+            row = self.mat.get_row(r)
+            if (row != Matrix([0 for _ in range(dim2)])):
+                nz_count += 1
+
+        return nz_count
         
     def is_RREF(self):
         '''
@@ -170,18 +179,17 @@ class GaussJordonSolver:
         dim1 = self.mat.get_size()[0]
         dim2 = self.mat.get_size()[1]
 
-        print (self.mat)
-
-        def check_leading_entries():
+        def _check_leading_entries():
             prev_le_idx = -1 # index of leading 1 per row
-
             le_idx = []
 
-            for r in range(dim1):
+            new_dim1 = self.get_nonzero_row_count()
+
+            for r in range(new_dim1):
                 cur_le_idx = 0
                 row = self.mat.get_row(r)
 
-                if (row != Matrix([0 for _ in range(dim2)])):
+                if (row != [0 for _ in range(dim2)]):
                     # check leading entry per row
                     for k in range(len(row)):
                         if row[k] == 1:
@@ -202,7 +210,7 @@ class GaussJordonSolver:
             return [True, le_idx]
 
         def check_cols():
-            [le_res, le_idxs] = check_leading_entries()
+            [le_res, le_idxs] = _check_leading_entries()
             
             if (le_res):
                 for j in range(len(le_idxs)):
@@ -219,34 +227,44 @@ class GaussJordonSolver:
 
         def check_zero_rows():
             if (dim1 == 1):
-                return self.mat.get_row(0) != Matrix([0 for _ in range(dim2)])
+                return self.mat.get_row(0) != [0 for _ in range(dim2)]
             if (dim1 > 1):
                 # 0 or more zero rows
                 n_zero_rows = 0
                 
                 for r in range(dim1):
                     row = self.mat.get_row(r)
-                    if (row == Matrix([0 for _ in range(dim2)])):
+                    if (row == [0 for _ in range(dim2)]):
                         n_zero_rows += 1
 
                 n_zero_rows_back = 0
-                for r in range(dim1, 0, -1):
+                for r in range(dim1-1, n_zero_rows-1, -1):
                     row = self.mat.get_row(r)
-                    if (row == Matrix([0 for _ in range(dim2)])):
+                    if (row == [0 for _ in range(dim2)]):
                         n_zero_rows_back += 1
 
                 '''
                 If zero rows are stacked at the bottom, the number of zero rows
                 from the bottom will be equal to the total number of zero rows
                 '''
-                if n_zero_rows == n_zero_rows_back:
-                    # remove the zero rows
-                    self.mat = self.filter_zeros()
-                    return True
-                else:
+                return n_zero_rows == n_zero_rows_back
+
+        def check_aug_col():
+            aug_col = self.mat.get_col(self.mat.mat, dim2-1)
+            n_non_zero_rows = self.get_nonzero_row_count()
+            
+            # check each row for inconsistency (zeros with non-zero augmentation)
+            for r in range(n_non_zero_rows-1, dim1):
+                row = self.mat.get_row(r)
+                aug_element = row[-1]
+                prefix = row[:dim2-1]
+
+                if (prefix == [0 for _ in range(dim2-1)]) and aug_element != 0:
                     return False
 
-        return check_zero_rows() and check_cols()
+            return True
+
+        return check_zero_rows() and check_cols() and check_aug_col()
 
     def solve(self):
         return True
