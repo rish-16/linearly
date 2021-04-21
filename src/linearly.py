@@ -171,9 +171,10 @@ class GaussJordonSolver:
 
         Returns True if matrix is in RREF, False otherwise
 
-        [ 1 0 a 0 | b ]
-        [ 0 1 c 0 | d ]
-        [ 0 0 0 1 | e ]
+        [ 1 0 a 0 0 | b ]
+        [ 0 1 c 0 0 | d ]
+        [ 0 0 0 1 1 | e ]
+        [ 0 0 0 0 0 | 0 ]
         '''
 
         dim1 = self.mat.get_size()[0]
