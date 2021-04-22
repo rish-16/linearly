@@ -1,3 +1,6 @@
+from collections import deque
+import random, copy
+
 class Matrix():
     def __init__(self, mat):
         """
@@ -122,31 +125,55 @@ class Matrix():
     def is_RREF(self):
         gjs = GaussJordonSolver(self)
         return gjs.is_RREF()
-        
-class GaussJordonSolver:
-    def __init__(self, mat):
-        self.mat = mat
-    
+
+class GJState:
+    def __init__(self, state):
+        self.state = state
+
     def ero_type_1(self, i, k):
         """
         Type 1 ERO: non-zero scalar multiplication
         """
-        self.mat[i] = [k * self.mat[i][j] for j in range(len(self.mat[i]))]
+        self.state.mat[i] = [k * self.state.mat[i][j] for j in range(len(self.state.mat[i]))]
         
     def ero_type_2(self, i, j):
         """
         Type 2 ERO: row swapping
         """
-        
-        temp = self.mat[i]
-        self.mat[i] = self.mat[j]
-        self.mat[j] = temp
+        temp = self.state.mat[i]
+        self.state.mat[i] = self.state.mat[j]
+        self.state.mat[j] = temp
         
     def ero_type_3(self, i, j, k):
         """
         Type 3 ERO: addition of scalar multiple of row
         """
-        self.mat[i] = [self.mat[i] + (k * self.mat[j][p]) for p in range(len(self.mat[j]))]
+        self.state.mat[i] = [self.state.mat[i] + (k * self.state.mat[j][p]) for p in range(len(self.state.mat[j]))]        
+
+    def get_children(self):
+        children = []
+
+        ORIGINAL = copy.deepcopy(self.state)
+
+        dim1 = self.state.get_size()[0]
+        dim2 = self.state.get_size()[1]
+
+        i, j = random.randint(0, dim1), random.randint(0, dim1)
+        while (i == j):
+            i, j = random.randint(0, dim1), random.randint(0, dim1)
+
+        ero1 = self.ero_type_1(i, j)
+        children.append(ero1)
+
+        self.state = ORIGINAL
+        
+
+        return children
+
+        
+class GaussJordonSolver:
+    def __init__(self, mat):
+        self.mat = mat
 
     def get_nonzero_row_count(self):
         dim1 = self.mat.get_size()[0]
@@ -267,5 +294,34 @@ class GaussJordonSolver:
 
         return check_zero_rows() and check_cols() and check_aug_col()
 
-    def solve(self):
-        return True
+    def solve(self, solve_limit=200):
+        '''
+        Treats the Gauss-Jordan Elimination process as Graph Theory problem.
+        Performs Breadth First Search (BFS) on all possible states until one
+        with the appropriate RREF representation is encountered. Graph nodes 
+        represent the state of the matrix after the Elementary Row Ops have been
+        performed on it. Edges are unweighted state transitions between matrices.
+
+        Returns the RREF matrix for a given matrix if it exists.
+
+        If not solvable within `stop_limit` steps, stop the process.
+        '''
+        visited = dict()
+        start_node = GJState(self)
+        visited[start_node] = True
+        STEPS = 0
+
+        frontier = deque()
+        frontier.append(start_node)
+
+        while (not len(frontier) == 0 and STEPS <= solve_limit):
+            new_state = frontier.popleft()
+
+            if (new_state.state.is_RREF()):
+                return new_state.state
+
+            for child_state in new_state.get_children(): # all possible EROs applied to current state
+                if (not visited.has_key(child_state)):
+                    visited[child_state] = True
+                    STEPS += 1
+                    frontier.append(child_state)
