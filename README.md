@@ -2,7 +2,7 @@
 Python implementation of Linear Algebra concepts
 
 ### Why
-I took a [Linear Algebra class](https://nusmods.com/modules/MA1101R/linear-algebra-i) this semester in college and was really intrigued by the various operations and concepts involved. Here, I try to implement these concepts one by one. You can think of it as a highly-discounted reimplementation of MATLAB.
+I took a [Linear Algebra class](https://nusmods.com/modules/MA1101R/linear-algebra-i) last semester in college and was really intrigued by the various operations and concepts involved. Here, I try to implement these concepts one by one. You can think of it as a highly-discounted reimplementation of MATLAB or NumPy.
 
 ### Operations and Concepts
 - [x] Matrix Operations (addition, subtraction, multiplication)
