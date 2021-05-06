@@ -325,3 +325,5 @@ class GaussJordonSolver:
                     visited[child_state] = True
                     STEPS += 1
                     frontier.append(child_state)
+
+        
